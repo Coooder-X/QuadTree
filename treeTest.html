@@ -7,12 +7,21 @@
     <title>Document</title>
 </head>
 <body>
+    <canvas id="canvas" width="1000" height="600"></canvas> 
+
     <script type="text/javascript" src="./QuadTree.js"></script>    
     <script type="text/javascript">
         nodes = [{x:100, y:100}, {x:200, y:150}, {x:800, y:400}, {x:900, y:500}, {x:900, y:50}];
         var quadTree = new QuadTree(1000, 600);
         quadTree.build(nodes);
         console.log(quadTree);
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        setInterval(function(){
+            ctx.clearRect(0,0,1000,600);
+            quadTree.dfsPaint(ctx, quadTree.root);
+            ctx.strokeRect(0,0,1000,600);
+        },30);
     </script>
 </body>
 </html>

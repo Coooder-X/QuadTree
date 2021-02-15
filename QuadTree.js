@@ -11,8 +11,6 @@ class QuadTree {
 
     build(nodes) {
         for(let i = 0; i < nodes.length; ++i) {
-            // console.log(this);
-            
             this.add(this.root, nodes[i]);
         }
     }
@@ -26,10 +24,8 @@ class QuadTree {
             let pos = root.calPos(node.x, node.y, size.w, size.h);
             //  更新数据node进入的新节点的center、数据、total
             root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
-            root.child[pos.idx].dataX = root.child[pos.idx].centerX = node.x;    
-            root.child[pos.idx].dataY = root.child[pos.idx].centerY = node.y;
-            root.child[pos.idx].total = 1;   
-            //  update root
+            root.child[pos.idx].setInfo(node.x, node.y, node.x, node.y, 1);  
+            //  update current root
             root.centerX = node.x;
             root.centerY = node.y;
             root.total = 1;
@@ -40,16 +36,10 @@ class QuadTree {
         if(root.isLeaf() && root != this.root) { //  root是叶子节点，则内部已包含一个数据k，则应重新划分区域，放入node和k
             //  
             let tmpNode = {x: root.dataX, y: root.dataY};   //  当前root包含的数据的坐标
-            // root = new TreeNode(root.areaX, root.areaY, root.width, root.height);
-            root.areaX = root.areaX;
-            root.areaY = root.areaY;
-            root.width = root.width;
-            root.height = root.height;
+            root.dataX = root.dataY = NaN, root.data = null;  //  清除当前root数据
             let pos = root.calPos(tmpNode.x, tmpNode.y, size.w, size.h);    //  判断原数据k应划分在那个象限
             root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
-            root.child[pos.idx].dataX = root.child[pos.idx].centerX = tmpNode.x;    //  更新原数据k进入的新节点的center、数据、total
-            root.child[pos.idx].dataY = root.child[pos.idx].centerY = tmpNode.y;
-            root.child[pos.idx].total = 1;
+            root.child[pos.idx].setInfo(tmpNode.x, tmpNode.y, tmpNode.x, tmpNode.y, 1);//  更新原数据k进入的新节点的center、数据、total
 
             this.add(root, node);
             //  重新计算root的center和total
@@ -78,6 +68,28 @@ class QuadTree {
         }
     }
 
+    dfsPaint(ctx, root) {
+        if(root.isLeaf() && root != this.root) {
+            ctx.beginPath();
+            ctx.arc(root.dataX, root.dataY, 3, 0, Math.PI*2, false);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+            ctx.closePath()
+        }
+        else {
+            ctx.beginPath();
+            ctx.arc(root.centerX, root.centerY, 3, 0, Math.PI*2, false);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.closePath()
+        }
+        for(let i = 0; i < root.child.length; ++i) {
+            if(root.child[i] != null) {
+                this.dfsPaint(ctx, root.child[i]);
+            }
+        }
+    }
+
 }
 
 class TreeNode {
@@ -92,6 +104,13 @@ class TreeNode {
         this.child = [null, null, null, null];
         this.width = w;
         this.height = h;
+        this.data = null;
+    }
+
+    setInfo(dataX, dataY, centerX, centerY, total) {
+        this.dataX = dataX, this.dataY = dataY;
+        this.centerX = centerX, this.centerY = centerY;
+        this.total = total;
     }
 
     isLeaf() {
@@ -105,7 +124,6 @@ class TreeNode {
     calPos(x, y, sizeX, sizeY) {    //  返回(x, y)所在的块的idx，区域的长宽
         let posx = x - this.areaX, posy = y - this.areaY;
         let i = Math.floor(posx / sizeX), j = Math.floor(posy / sizeY);
-        console.log(i + ' ' + j);
         if(i == 0 && j == 0)
             return {idx: 0, x: this.areaX, y: this.areaY};    // 左上
         else if(i == 1 && j == 0)
