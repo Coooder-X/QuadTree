@@ -57,13 +57,22 @@ class QuadTree {
                 rt.dataY = rt.centerY = node.y;
                 rt.total = 1;
                 this.size++;
+                //  update current root
+                root.total++;
+                root.centerX = (root.centerX + rt.centerX) / 2;
+                root.centerY = (root.centerY + rt.centerY) / 2;
             }
             else {
-                let n = root.total;
-                root.centerX = (root.centerX * n + node.x) / (n + 1);
-                root.centerY = (root.centerY * n + node.y) / (n + 1);   //  更新center, total
-                root.total++;
                 this.add(rt, node);
+                root.total++;
+                let xx = 0, yy = 0, cnt = 0;
+                for(let i = 0; i < 4; ++i) {
+                    if(root.child[i]) {
+                        xx += root.child[i].centerX, yy += root.child[i].centerY;
+                        cnt++;
+                    }
+                }
+                root.centerX = xx / cnt, root.centerY = yy / cnt;
             }
         }
     }
