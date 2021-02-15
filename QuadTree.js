@@ -21,37 +21,52 @@ class QuadTree {
         if(root == null)
             return;
         let size = {w: root.width / 2, h: root.height / 2};
-        let tmpNode = null;
-        if(root.isLeaf()) { //  root是叶子节点，则内部已包含一个数据k，则应重新划分区域，放入node和k
-            if(!Number.isNaN(root.dataX)) {
-                tmpNode = {x: root.dataX, y: root.dataY};   //  当前root包含的数据的坐标
-                root.dataX = root.dataY = NaN;
-                let pos = root.calPos(tmpNode.x, tmpNode.y, size.w, size.h);    //  判断数据k应划分在那个象限
-                root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
-                root.child[pos.idx].dataX = root.child[pos.idx].centerX = tmpNode.x;    //  更新数据k进入的新节点的center、数据、total
-                root.child[pos.idx].dataY = root.child[pos.idx].centerY = tmpNode.y;
-                root.child[pos.idx].total = 1;
-            }
-            let pos = root.calPos(node.x, node.y, size.w, size.h)
+        if(root === this.root && this.size == 0) { //  quadtree根的情况特判
+            //  如果是根，直接创建node
+            let pos = root.calPos(node.x, node.y, size.w, size.h);
+            //  更新数据node进入的新节点的center、数据、total
             root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
-            root.child[pos.idx].dataX = root.child[pos.idx].centerX = node.x;    //  更新数据node进入的新节点的center、数据、total
+            root.child[pos.idx].dataX = root.child[pos.idx].centerX = node.x;    
             root.child[pos.idx].dataY = root.child[pos.idx].centerY = node.y;
+            root.child[pos.idx].total = 1;   
+            //  update root
+            root.centerX = node.x;
+            root.centerY = node.y;
+            root.total = 1;
+            this.size++;
+            return;
+        }
+
+        if(root.isLeaf() && root != this.root) { //  root是叶子节点，则内部已包含一个数据k，则应重新划分区域，放入node和k
+            //  
+            let tmpNode = {x: root.dataX, y: root.dataY};   //  当前root包含的数据的坐标
+            // root = new TreeNode(root.areaX, root.areaY, root.width, root.height);
+            root.areaX = root.areaX;
+            root.areaY = root.areaY;
+            root.width = root.width;
+            root.height = root.height;
+            let pos = root.calPos(tmpNode.x, tmpNode.y, size.w, size.h);    //  判断原数据k应划分在那个象限
+            root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
+            root.child[pos.idx].dataX = root.child[pos.idx].centerX = tmpNode.x;    //  更新原数据k进入的新节点的center、数据、total
+            root.child[pos.idx].dataY = root.child[pos.idx].centerY = tmpNode.y;
             root.child[pos.idx].total = 1;
+
+            this.add(root, node);
             //  重新计算root的center和total
-            let n = tmpNode? 2 : 1;
-            root.centerX = (tmpNode? tmpNode.x : 0 + node.x) / n;
-            root.centerY = (tmpNode? tmpNode.y : 0 + node.y) / n;
-            root.total = n;
+            root.centerX = (tmpNode.x + node.x) / 2;
+            root.centerY = (tmpNode.y + node.y) / 2;
+            root.total = 2;
             return;
         }
         else {  //  非叶子节点，选择合适分支，递归进行插入node
             let pos = root.calPos(node.x, node.y, size.w, size.h);
             let rt = root.child[pos.idx];
             if(rt == null) {
-                rt = new TreeNode(pos.x, pos.y, size.w, size.h);
+                rt = root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
                 rt.dataX = rt.centerX = node.x;    //  更新数据k进入的新节点的center、数据、total
                 rt.dataY = rt.centerY = node.y;
                 rt.total = 1;
+                this.size++;
             }
             else {
                 let n = root.total;
@@ -63,21 +78,10 @@ class QuadTree {
         }
     }
 
-
 }
-// var t = QuadTree();
-// alert(t);
-// alert("alsdfjalsfjd;ajd;lfksajl;sdf");
-// function updateNode(root, nodes) {
-//     root.total = nodes.length;
-//     let x = 0, y = 0;
-//     for(let i = 0; i < nodes.length; ++i) {
-//         x += nodes[i].
-//     }
-// }
+
 class TreeNode {
     constructor(x, y, w, h) {
-        // alert("----------------------------");
         this.centerX = NaN;
         this.centerY = NaN;
         this.total = NaN;
