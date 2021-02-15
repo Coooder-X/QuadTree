@@ -74,14 +74,25 @@ class QuadTree {
             ctx.arc(root.dataX, root.dataY, 3, 0, Math.PI*2, false);
             ctx.fillStyle = 'black';
             ctx.fill();
-            ctx.closePath()
+            ctx.closePath();
         }
         else {
             ctx.beginPath();
             ctx.arc(root.centerX, root.centerY, 3, 0, Math.PI*2, false);
             ctx.fillStyle = 'red';
             ctx.fill();
-            ctx.closePath()
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.moveTo (root.areaX + root.width / 2, root.areaY);       //设置起点状态
+            ctx.lineTo (root.areaX + root.width / 2, root.areaY + root.height);       //设置末端状态
+            ctx.lineWidth = 2;          //设置线宽状态
+            ctx.strokeStyle = "#E0E0E0" ;  //设置线的颜色状态
+            ctx.moveTo (root.areaX, root.areaY + root.height / 2);       //设置起点状态
+            ctx.lineTo (root.areaX + root.width, root.areaY + root.height / 2);       //设置末端状态
+            ctx.stroke();               //进行绘制
+
+            ctx.closePath();
         }
         for(let i = 0; i < root.child.length; ++i) {
             if(root.child[i] != null) {
