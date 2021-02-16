@@ -34,7 +34,6 @@ class QuadTree {
         }
 
         if(root.isLeaf() && root != this.root) { //  root是叶子节点，则内部已包含一个数据k，则应重新划分区域，放入node和k
-            //  
             let tmpNode = {x: root.dataX, y: root.dataY};   //  当前root包含的数据的坐标
             root.dataX = root.dataY = NaN, root.data = null;  //  清除当前root数据
             let pos = root.calPos(tmpNode.x, tmpNode.y, size.w, size.h);    //  判断原数据k应划分在那个象限
@@ -43,9 +42,8 @@ class QuadTree {
 
             this.add(root, node);
             //  重新计算root的center和total
-            root.centerX = (tmpNode.x + node.x) / 2;
-            root.centerY = (tmpNode.y + node.y) / 2;
             root.total = 2;
+            this.updateCenter(root);
             return;
         }
         else {  //  非叶子节点，选择合适分支，递归进行插入node
@@ -59,22 +57,25 @@ class QuadTree {
                 this.size++;
                 //  update current root
                 root.total++;
-                root.centerX = (root.centerX + rt.centerX) / 2;
-                root.centerY = (root.centerY + rt.centerY) / 2;
+                this.updateCenter(root);
             }
             else {
                 this.add(rt, node);
                 root.total++;
-                let xx = 0, yy = 0, cnt = 0;
-                for(let i = 0; i < 4; ++i) {
-                    if(root.child[i]) {
-                        xx += root.child[i].centerX, yy += root.child[i].centerY;
-                        cnt++;
-                    }
-                }
-                root.centerX = xx / cnt, root.centerY = yy / cnt;
+                this.updateCenter(root);
             }
         }
+    }
+    //  更新质心
+    updateCenter(root) {
+        let totalWeight = root.total, xx = 0, yy = 0;
+        for(let i = 0; i < 4; ++i) {
+            let son = root.child[i];
+            if(son) {
+                xx += son.centerX * son.total, yy += son.centerY * son.total;
+            }
+        }
+        root.centerX = xx / totalWeight, root.centerY = yy / totalWeight;
     }
 
     dfsPaint(ctx, root) {
@@ -116,7 +117,7 @@ class TreeNode {
     constructor(x, y, w, h) {
         this.centerX = NaN;
         this.centerY = NaN;
-        this.total = NaN;
+        this.total = 0;
         this.areaX = x;
         this.areaY = y;
         this.dataX = NaN;
