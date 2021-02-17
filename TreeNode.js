@@ -13,10 +13,11 @@ export default class TreeNode {
         this.data = null;
     }
 
-    setInfo(dataX, dataY, centerX, centerY, total) {
+    setInfo(dataX, dataY, centerX, centerY, total, data) {
         this.dataX = dataX, this.dataY = dataY;
         this.centerX = centerX, this.centerY = centerY;
         this.total = total;
+        this.data = data;
     }
 
     isLeaf() {

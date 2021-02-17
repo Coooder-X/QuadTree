@@ -7,15 +7,17 @@ export default class QuadTree {
         this.size = 0;
         this.width = w || 1000; //  总显示区域的长宽
         this.height = h || 600;
+        this.map = new Map();
+        this.theta = 0.5;
     }
 
-    build(nodes) {
+    build(nodes, datas) {
         for(let i = 0; i < nodes.length; ++i) {
-            this.add(this.root, nodes[i]);
+            this.add(this.root, nodes[i], datas[i]);
         }
     }
 
-    add(root, node) {   //  node {x: "", y: ""}
+    add(root, node, data) {   //  node {x: "", y: ""}   data {name: "", E: ""}
         if(root == null)
             return;
         let size = {w: root.width / 2, h: root.height / 2};
@@ -24,25 +26,29 @@ export default class QuadTree {
             let pos = root.calPos(node.x, node.y, size.w, size.h);
             //  更新数据node进入的新节点的center、数据、total
             root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
-            root.child[pos.idx].setInfo(node.x, node.y, node.x, node.y, 1);  
+            root.child[pos.idx].setInfo(node.x, node.y, node.x, node.y, data.E, data);  
+            //  update map
+            this.map.set(data.name, root.child[pos.idx]);
             //  update current root
             root.centerX = node.x;
             root.centerY = node.y;
-            root.total = 1;
+            root.total = data.E;
             this.size++;
             return;
         }
 
         if(root.isLeaf() && root != this.root) { //  root是叶子节点，则内部已包含一个数据k，则应重新划分区域，放入node和k
-            let tmpNode = {x: root.dataX, y: root.dataY};   //  当前root包含的数据的坐标
+            let tmpNode = {x: root.dataX, y: root.dataY, data: root.data};   //  当前root包含的数据的坐标
             root.dataX = root.dataY = NaN, root.data = null;  //  清除当前root数据
             let pos = root.calPos(tmpNode.x, tmpNode.y, size.w, size.h);    //  判断原数据k应划分在那个象限
             root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
-            root.child[pos.idx].setInfo(tmpNode.x, tmpNode.y, tmpNode.x, tmpNode.y, 1);//  更新原数据k进入的新节点的center、数据、total
+            root.child[pos.idx].setInfo(tmpNode.x, tmpNode.y, tmpNode.x, tmpNode.y, tmpNode.data.E, tmpNode.data);//  更新原数据k进入的新节点的center、数据、total、data
+            //  update map
+            this.map.set(tmpNode.data.name, root.child[pos.idx]);
 
-            this.add(root, node);
+            this.add(root, node, data);
             //  重新计算root的center和total
-            root.total = 2;
+            root.total = tmpNode.data.E + data.E;
             this.updateCenter(root);
             return;
         }
@@ -53,15 +59,18 @@ export default class QuadTree {
                 rt = root.child[pos.idx] = new TreeNode(pos.x, pos.y, size.w, size.h);
                 rt.dataX = rt.centerX = node.x;    //  更新数据k进入的新节点的center、数据、total
                 rt.dataY = rt.centerY = node.y;
-                rt.total = 1;
+                rt.total = data.E;
+                rt.data = data;
+                //  update map
+                this.map.set(data.name, rt);
                 this.size++;
                 //  update current root
-                root.total++;
+                root.total += data.E;
                 this.updateCenter(root);
             }
             else {
-                this.add(rt, node);
-                root.total++;
+                this.add(rt, node, data);
+                root.total += data.E;
                 this.updateCenter(root);
             }
         }
