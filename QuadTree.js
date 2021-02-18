@@ -93,6 +93,8 @@ export default class QuadTree {
             ctx.arc(root.dataX, root.dataY, 3, 0, Math.PI*2, false);
             ctx.fillStyle = 'black';
             ctx.fill();
+            ctx.font="16px Georgia";
+            ctx.fillText(root.data.name, root.dataX + 8, root.dataY - 8);
             ctx.closePath();
         }
         else {
