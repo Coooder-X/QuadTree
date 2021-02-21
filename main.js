@@ -1,4 +1,5 @@
 import QuadTree from "./QuadTree.js";
+import ManyBody from "./manyBody.js";
 
 var nodes = [{x:100, y:100}, {x:200, y:130}, {x:800, y:400}, {x:900, y:500}, {x:900, y:50}];
 var datas = [{name:'A', E:10}, {name:'B', E:20}, {name:'C', E:15}, {name:'D', E:30}, {name:'E', E:45}];
@@ -10,11 +11,14 @@ for(let i = 0; i < nodes.length; ++i) {
 }
 x /= sumE, y /= sumE;
 
-var quadTree = new QuadTree(1000, 600);
-quadTree.build(nodes, datas);
-console.log(quadTree.root);
+// var quadTree = new QuadTree(1000, 600);
+// quadTree.build(nodes, datas);
+// console.log(quadTree.root);
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
+var manyBody = new ManyBody(ctx, 1000, 600);
+manyBody.nodes = nodes, manyBody.datas = datas;
+manyBody.buildTree();
 setInterval(function(){
     ctx.clearRect(0,0,1000,600);
     ctx.beginPath();
@@ -22,6 +26,7 @@ setInterval(function(){
     ctx.fillStyle = 'green';
     ctx.fill();
     ctx.closePath();
-    quadTree.dfsPaint(ctx, quadTree.root);
+    manyBody.quadTree.dfsPaint(ctx, manyBody.quadTree.root);
+    manyBody.forceOnBodies();
     ctx.strokeRect(0,0,1000,600);
 },30);

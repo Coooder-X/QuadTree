@@ -87,6 +87,40 @@ export default class QuadTree {
         root.centerX = xx / totalWeight, root.centerY = yy / totalWeight;
     }
 
+    force(root, node, ans) {
+        if(root.isLeaf()) { //  对于叶节点，直接加入合力
+            if(root != node) {
+                let F = this.chargeForce({dataX: root.dataX, dataY: root.dataY, data:{E: root.total}}, node);
+                ans.vx += F.vx, ans.vy += F.vy;
+            }
+        }
+        else {
+            let s = root.width;
+            let dx = node.dataX - root.centerX, dy = node.dataY - root.centerY;
+            let d = Math.sqrt(dx * dx + dy * dy);
+            if(s / d < this.theta) {    //  将该内部节点近似看成一个单独的物体
+                let F = this.chargeForce({dataX: root.centerX, dataY: root.centerY, data:{E: root.total}}, node);
+                ans.vx += F.vx, ans.vy += F.vy;
+            }
+            else {
+                for(let i = 0; i < 4; ++i) {
+                    if(root.child[i])
+                        this.force(root.child[i], node, ans);
+                }
+            }
+        }
+    }
+
+    chargeForce(src, tar) { //  src := {dataX: , dataY: }, tar := type of TreeNode
+        let dx = tar.dataX - src.dataX, dy = tar.dataY - src.dataY, dis = Math.sqrt(dx * dx + dy * dy);
+        let F =  src.data.E * tar.data.E / dis;
+        let sin = dy / dis, cos = dx / dis;
+        let vx = F * cos, vy = F * sin;  //     此处可以数学化简，减少一次开方
+        vx = tar.dataX > src.dataX? 1 : -1;
+        vy = tar.dataY > src.dataY? 1 : -1;
+        return {vx: vx, vy: vy};
+    }
+
     dfsPaint(ctx, root) {
         if(root.isLeaf() && root != this.root) {
             ctx.beginPath();
