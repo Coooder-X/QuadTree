@@ -2,7 +2,7 @@ import QuadTree from "./QuadTree.js";
 import ManyBody from "./manyBody.js";
 
 var nodes = [{x:100, y:100}, {x:200, y:130}, {x:800, y:400}, {x:900, y:500}, {x:900, y:50}];
-var datas = [{name:'A', E:10}, {name:'B', E:20}, {name:'C', E:15}, {name:'D', E:30}, {name:'E', E:45}];
+var datas = [{name:'A', E:100}, {name:'B', E:200}, {name:'C', E:150}, {name:'D', E:300}, {name:'E', E:450}];
 let x = 0, y = 0, sumE = 0;
 for(let i = 0; i < nodes.length; ++i) {
     x += nodes[i].x * datas[i].E;

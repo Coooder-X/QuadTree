@@ -89,8 +89,8 @@ export default class QuadTree {
 
     force(root, node, ans) {
         if(root.isLeaf()) { //  对于叶节点，直接加入合力
-            if(root != node) {
-                let F = this.chargeForce({dataX: root.dataX, dataY: root.dataY, data:{E: root.total}}, node);
+            if(root !== node) {
+                let F = this.chargeForce({dataX: root.dataX, dataY: root.dataY, data:{E: root.data.E}}, node);
                 ans.vx += F.vx, ans.vy += F.vy;
             }
         }
@@ -112,12 +112,14 @@ export default class QuadTree {
     }
 
     chargeForce(src, tar) { //  src := {dataX: , dataY: }, tar := type of TreeNode
-        let dx = tar.dataX - src.dataX, dy = tar.dataY - src.dataY, dis = Math.sqrt(dx * dx + dy * dy);
-        let F =  src.data.E * tar.data.E / dis;
-        let sin = dy / dis, cos = dx / dis;
-        let vx = F * cos, vy = F * sin;  //     此处可以数学化简，减少一次开方
-        vx = tar.dataX > src.dataX? 1 : -1;
-        vy = tar.dataY > src.dataY? 1 : -1;
+        let dx = tar.dataX - src.dataX, dy = tar.dataY - src.dataY;
+        let dis = Math.sqrt(dx * dx + dy * dy);
+        let F =  src.data.E * tar.data.E / (dis * dis);
+        let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
+        let vx = F * cos / tar.data.E, vy = F * sin / tar.data.E;  //     此处可以数学化简，减少一次开方
+        vx *= (dx > 0? 1 : -1);
+        vy *= (dy > 0? 1 : -1);
+        // console.log({vx: vx*1000, vy: vy*1000});
         return {vx: vx, vy: vy};
     }
 
