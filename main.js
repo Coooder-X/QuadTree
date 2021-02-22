@@ -20,6 +20,7 @@ var manyBody = new ManyBody(ctx, 1000, 600);
 manyBody.nodes = nodes, manyBody.datas = datas;
 manyBody.buildTree();
 setInterval(function(){
+    // manyBody.buildTree();
     ctx.clearRect(0,0,1000,600);
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI*2, false);
@@ -27,6 +28,6 @@ setInterval(function(){
     ctx.fill();
     ctx.closePath();
     manyBody.quadTree.dfsPaint(ctx, manyBody.quadTree.root);
-    manyBody.forceOnBodies();
+    manyBody.step();
     ctx.strokeRect(0,0,1000,600);
 },30);

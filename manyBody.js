@@ -1,6 +1,7 @@
 import QuadTree from "./QuadTree.js"
 export default class ManyBody {
     constructor(ctx, w, h) {
+        this.width = w, this.height = h;
         this.ctx = ctx;
         this.nodes = [];
         this.datas = [];
@@ -9,22 +10,24 @@ export default class ManyBody {
     }
     //  根据初始化node数据，建树
     buildTree() {
+        this.quadTree = new QuadTree(this.width, this.height);
         this.quadTree.build(this.nodes, this.datas);
     }
-    //  更新所有node的合力
-    forceOnBodies() {
+    //  更新所有node的合力 / 执行力的作用
+    step() {
         for(let i = 0; i < this.nodes.length; ++i) {
             let tarNode = this.quadTree.map.get(this.datas[i].name);
             let force = this.getForceOnBody(tarNode);
-            //.....
+            //力对位置的作用
+            this.nodes[i].x += force.vx, this.nodes[i].y += force.vy; 
         }
     }
     //  获得单个node的合力
     getForceOnBody(tarNode) {
         let ans = {vx: 0, vy: 0};
         this.quadTree.force(this.quadTree.root, tarNode, ans);
-        ans.vx *= 2000, ans.vy *= 2000;
-        this.paintForce(this.ctx, tarNode, ans);
+        // ans.vx *= 2000, ans.vy *= 2000;
+        this.paintForce(this.ctx, tarNode, {vx: ans.vx*200, vy:ans.vy*200});
         return ans;
     }
 

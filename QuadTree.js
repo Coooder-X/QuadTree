@@ -9,6 +9,7 @@ export default class QuadTree {
         this.height = h || 600;
         this.map = new Map();
         this.theta = 0.5;
+        this.G = 30;//0.0;
     }
 
     build(nodes, datas) {
@@ -114,7 +115,7 @@ export default class QuadTree {
     chargeForce(src, tar) { //  src := {dataX: , dataY: }, tar := type of TreeNode
         let dx = tar.dataX - src.dataX, dy = tar.dataY - src.dataY;
         let dis = Math.sqrt(dx * dx + dy * dy);
-        let F =  src.data.E * tar.data.E / (dis * dis);
+        let F =  this.G * src.data.E * tar.data.E / (dis * dis);
         let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
         let vx = F * cos / tar.data.E, vy = F * sin / tar.data.E;  //     此处可以数学化简，减少一次开方
         vx *= (dx > 0? 1 : -1);
