@@ -30,18 +30,19 @@ manyBody.buildTree();
 var pairName = choose(edges, datas), pair = [];
 var record = 0;
 
-// iter();
+iter();
 
 setInterval(function(){
-    manyBody.buildTree();
-    //  判断形状收敛，退出迭代
-    pair = getNodePair(pairName, manyBody.quadTree);
-    if(judge(pair, record))
-        return;
-    record = caldis(pair);
-    // console.log(record);
+    // manyBody.buildTree();
+    // //  判断形状收敛，退出迭代
+    // pair = getNodePair(pairName, manyBody.quadTree);
+    // if(judge(pair, record))
+    //     return;
+    // record = caldis(pair);
+    // // console.log(record);
 
     ctx.clearRect(0,0,1000,600);
+    manyBody.paintAllLinks();
     ctx.beginPath();
     let center = calAllCenter();
     ctx.arc(center.x, center.y, 5, 0, Math.PI*2, false);
@@ -50,7 +51,7 @@ setInterval(function(){
     ctx.closePath();
     manyBody.quadTree.dfsPaint(ctx, manyBody.quadTree.root);
     ctx.strokeRect(0,0,1000,600);
-    manyBody.step();
+    // manyBody.step();
 }, 1);
 
 function iter() {
