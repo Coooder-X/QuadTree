@@ -9,7 +9,7 @@ export default class QuadTree {
         this.height = h || 600;
         this.map = new Map();
         this.theta = 0.5;
-        this.G = 30;//0.0;
+        this.G = 35;  //  引力常数 (需要改为动态计算，适用于各种情况)
     }
 
     build(nodes, datas) {
@@ -91,7 +91,7 @@ export default class QuadTree {
     force(root, node, ans) {
         if(root.isLeaf()) { //  对于叶节点，直接加入合力
             if(root !== node) {
-                let F = this.chargeForce({dataX: root.dataX, dataY: root.dataY, data:{E: root.data.E}}, node);
+                let F = chargeForce({dataX: root.dataX, dataY: root.dataY, data:{E: root.data.E}}, node, this.G);
                 ans.vx += F.vx, ans.vy += F.vy;
             }
         }
@@ -100,7 +100,7 @@ export default class QuadTree {
             let dx = node.dataX - root.centerX, dy = node.dataY - root.centerY;
             let d = Math.sqrt(dx * dx + dy * dy);
             if(s / d < this.theta) {    //  将该内部节点近似看成一个单独的物体
-                let F = this.chargeForce({dataX: root.centerX, dataY: root.centerY, data:{E: root.total}}, node);
+                let F = chargeForce({dataX: root.centerX, dataY: root.centerY, data:{E: root.total}}, node, this.G);
                 ans.vx += F.vx, ans.vy += F.vy;
             }
             else {
@@ -110,18 +110,6 @@ export default class QuadTree {
                 }
             }
         }
-    }
-
-    chargeForce(src, tar) { //  src := {dataX: , dataY: }, tar := type of TreeNode
-        let dx = tar.dataX - src.dataX, dy = tar.dataY - src.dataY;
-        let dis = Math.sqrt(dx * dx + dy * dy);
-        let F =  this.G * src.data.E * tar.data.E / (dis * dis);
-        let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
-        let vx = F * cos / tar.data.E, vy = F * sin / tar.data.E;  //     此处可以数学化简，减少一次开方
-        vx *= (dx > 0? 1 : -1);
-        vy *= (dy > 0? 1 : -1);
-        // console.log({vx: vx*1000, vy: vy*1000});
-        return {vx: vx, vy: vy};
     }
 
     dfsPaint(ctx, root) {
@@ -159,4 +147,19 @@ export default class QuadTree {
         }
     }
 
+}
+
+export function chargeForce(src, tar, G) { //  src := {dataX: , dataY: , data: {E: }}, tar := type of TreeNode
+    let dx = tar.dataX - src.dataX, dy = tar.dataY - src.dataY;
+    let dis = Math.sqrt(dx * dx + dy * dy);
+    let F = Math.abs(G * src.data.E * tar.data.E / (dis * dis + 0.000001)); //  避免除以0
+    let dir = src.data.E * tar.data.E;
+    let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
+    let vx = F * cos / tar.data.E, vy = F * sin / tar.data.E;  //     此处可以数学化简，减少一次开方
+    vx *= (dx > 0? 1 : -1);
+    vy *= (dy > 0? 1 : -1);
+    if(dir < 0) {
+        vx = -vx, vy = -vy;
+    }
+    return {vx: vx, vy: vy};
 }
