@@ -2,7 +2,7 @@ import QuadTree from "./QuadTree.js";
 import TreeNode from "./TreeNode.js";
 export function judge(pair, record) {
     let dis = caldis(pair);
-    return Math.abs(dis - record) < 0.00003;//0.0002;
+    return Math.abs(dis - record) < 0.0003;//0.0002;
 }
 
 export function caldis(pair) {

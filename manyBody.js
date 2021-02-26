@@ -35,7 +35,7 @@ export default class ManyBody {
     getForceOnBody(tarNode) {
         let ans = {vx: 0, vy: 0};
         this.quadTree.force(this.quadTree.root, tarNode, ans);
-        this.paintForce(this.ctx, tarNode, {vx: ans.vx*80, vy:ans.vy*80});
+        // this.paintForce(this.ctx, tarNode, {vx: ans.vx*80, vy:ans.vy*80});
         return ans;
     }
 
@@ -61,7 +61,7 @@ export default class ManyBody {
             src.y += (dy > 0? -vy : vy);
             tar.x += (dx > 0? vx : -vx);
             tar.y += (dy > 0? vy : -vy);
-            this.paintLink(src, tar);
+            // this.paintLink(src, tar);
         }
     }
 
