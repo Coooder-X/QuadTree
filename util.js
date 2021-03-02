@@ -129,16 +129,40 @@ export function getTree(tree) {
             }
         }
     }
-    for(let i = 0; i < datas.length; ++i) {
-        nodes.push(getNodePos());
-    }
-    return {nodes:nodes, edges: edges, datas: datas};
+    return {edges: edges, datas: datas};
 }
 
 function getLen(num) {
-    return num * 280;
+    return num * 380;	//	280
 }
 
 function getE(len) {
     return len * 1300;
+}
+
+export function initTreeShape(tree, width=1000, height=600) {
+	let nodes = [];
+	let que = new Array(), now = {node: tree, pos: {x: width/2, y: height/2}, alpha: 0};
+    que.push(now);
+    while(que.length) {
+        now = que[0];
+		nodes.push(now.pos);
+        que.shift();
+        if(now.node.children != undefined) { //  是非叶子节点
+			let childrenList = [], leafList = [];
+			now.node.children.forEach(child => {
+				if(child != undefined)
+					childrenList.push(child);
+			});
+			let nowAlpha = 0.0, subAlpha = 2 * Math.PI / (childrenList.length + 1);// + 0.05 / (2 * Math.PI);
+			childrenList.forEach(child => {
+				nowAlpha += subAlpha;
+				let tmpAlpha = Math.PI - now.alpha + nowAlpha;
+				let dx = Math.cos(tmpAlpha) * getLen(child.branch_length), dy = Math.sin(tmpAlpha) * getLen(child.branch_length);
+				let tmpPos = {x: now.pos.x + dx, y: now.pos.y + dy};
+				que.push({node: child, pos: tmpPos, alpha: tmpAlpha});
+			});
+        }
+    }
+	return nodes;
 }

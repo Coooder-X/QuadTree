@@ -1,7 +1,7 @@
 import QuadTree from "./QuadTree.js";
 import ManyBody from "./manyBody.js";
 import {judge, choose, caldis, getNodePair} from "./stop.js" ;
-import {paintCenter, getNodePos, getTree, nwk2json, randomNum} from "./util.js";
+import {paintCenter, getNodePos, getTree, nwk2json, randomNum, initTreeShape} from "./util.js";
 
 // var nodes = [{x:100, y:100}, {x:200, y:130}, {x:800, y:400}, {x:900, y:500}, {x:900, y:50}];
 // var nodes = [getNodePos(), getNodePos(), getNodePos(), getNodePos(), getNodePos()];
@@ -18,7 +18,7 @@ let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
 // let info = nwk2json('((C:0.3,D:0.4)E:0.1)F');
 let tree = getTree(info);
 console.log(tree);
-var nodes = tree.nodes, edges = tree.edges, datas = tree.datas;
+var nodes = initTreeShape(info, 1000, 600), edges = tree.edges, datas = tree.datas;
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
