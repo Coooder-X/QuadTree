@@ -15,6 +15,7 @@ import {paintCenter, getNodePos, getTree, nwk2json, randomNum} from "./util.js";
 // var edges = [{source: 0, target: 1, length: 70}, {source: 1, target: 2, length: 60}, {source: 2, target: 3, length: 30}, {source: 2, target: 4, length: 55}, {source: 3, target: 5, length: 55}];
 
 let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
+// let info = nwk2json('((C:0.3,D:0.4)E:0.1)F');
 let tree = getTree(info);
 console.log(tree);
 var nodes = tree.nodes, edges = tree.edges, datas = tree.datas;

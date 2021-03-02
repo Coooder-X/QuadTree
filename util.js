@@ -136,9 +136,9 @@ export function getTree(tree) {
 }
 
 function getLen(num) {
-    return num * 200;
+    return num * 280;
 }
 
 function getE(len) {
-    return len * 1000;
+    return len * 1300;
 }

@@ -24,6 +24,7 @@ export default class ManyBody {
             this.nodes[i].x += force.vx, this.nodes[i].y += force.vy; 
 
             this.linkForce();
+            this.limit(this.nodes[i]);
             // if(this.datas[i].name == 'C') {
             //     this.nodes[i].x = this.width/2, this.nodes[i].y = this.height/2; 
             //     continue;
@@ -57,6 +58,8 @@ export default class ManyBody {
             let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
             let F = this.k * Math.abs(dis - this.edges[i].length);
             let vx = F * cos, vy = F * sin;
+            let maxV = 10;   //  最大速度限制
+            vx = Math.min(Math.abs(vx), maxV), vy = Math.min(Math.abs(vy), maxV);
             src.x += (dx > 0? -vx : vx);
             src.y += (dy > 0? -vy : vy);
             tar.x += (dx > 0? vx : -vx);
@@ -96,6 +99,13 @@ export default class ManyBody {
         for(let i = 0; i < this.nodes.length; ++i) {
             this.nodes[i].x -= dx * 0.05, this.nodes[i].y -= dy * 0.05;
         }
+    }
+
+    limit(node) {
+        node.x = Math.min(node.x, this.width);
+        node.x = Math.max(node.x, 0);
+        node.y = Math.min(node.y, this.height);
+        node.y = Math.max(node.y, 0);
     }
 
 }
