@@ -2,6 +2,7 @@ import QuadTree from "./QuadTree.js";
 import ManyBody from "./manyBody.js";
 import {judge, choose, caldis, getNodePair} from "./stop.js" ;
 import {paintCenter, getNodePos, getTree, nwk2json, randomNum, initTreeShape} from "./util.js";
+import {paintAllLinks, dfsPaint} from "./DrawUtil.js";
 
 // var nodes = [{x:100, y:100}, {x:200, y:130}, {x:800, y:400}, {x:900, y:500}, {x:900, y:50}];
 // var nodes = [getNodePos(), getNodePos(), getNodePos(), getNodePos(), getNodePos()];
@@ -34,9 +35,9 @@ var record = 0;
 setInterval(function(){
     paintAmimation();
     ctx.clearRect(0,0,1000,600);
-    manyBody.paintAllLinks();
+    paintAllLinks(manyBody.nodes, manyBody.edges, ctx);
     paintCenter(ctx, nodes, datas);
-    manyBody.quadTree.dfsPaint(ctx, manyBody.quadTree.root);
+    dfsPaint(ctx, manyBody.quadTree.root);
     ctx.strokeRect(0,0,1000,600);
 }, 1);
 

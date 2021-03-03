@@ -68,24 +68,6 @@ export default class ManyBody {
         }
     }
 
-    paintLink(src, tar) {
-        let ctx = this.ctx;
-        ctx.beginPath();
-        ctx.moveTo (src.x, src.y);       //设置起点状态
-        ctx.lineTo (tar.x, tar.y);       //设置末端状态
-        ctx.lineWidth = 2;//0.5;          //设置线宽状态
-        ctx.strokeStyle = "#DAB1D5" ;  //设置线的颜色状态
-        ctx.stroke();  
-        ctx.closePath();
-    }
-
-    paintAllLinks() {
-        for(let i = 0; i < this.edges.length; ++i) {
-            let src = this.nodes[this.edges[i].source], tar = this.nodes[this.edges[i].target];
-            this.paintLink(src, tar);
-        }
-    }
-
     /*
         迭代到一定程度时，将系统重心与屏幕中心重合显示
     */
