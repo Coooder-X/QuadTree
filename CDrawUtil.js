@@ -61,3 +61,24 @@ function canvasText(x, y, ctx, fontSize, font, color, text) {
     ctx.fillText(text, x, y);
     ctx.closePath();
 }
+
+//  绘制重心
+export function paintCenter(ctx, nodes, datas) {
+    ctx.beginPath();
+    let center = calAllCenter(nodes, datas);
+    ctx.arc(center.x, center.y, 5, 0, Math.PI*2, false);
+    ctx.fillStyle = 'green';
+    ctx.fill();
+    ctx.closePath();
+}
+//  计算重心
+function calAllCenter(nodes, datas) {
+    let x = 0, y = 0, sumE = 0;
+    for(let i = 0; i < nodes.length; ++i) {
+        x += nodes[i].x * datas[i].E;
+        y += nodes[i].y * datas[i].E;
+        sumE += datas[i].E;
+    }
+    x /= sumE, y /= sumE;
+    return {x: x, y: y};
+}

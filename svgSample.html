@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style>
+#div1 {width:780px; height:400px; background:url(img/bg.jpg) no-repeat;  margin:20px auto; overflow:hidden; }
+body {background:black; }
+</style>
+<script>
+
+// <!--svg中创建标签的方法-->
+window.onload=function(){
+  var svgNS='http://www.w3.org/2000/svg';   //命名空间
+  var oParent=document.getElementById('div1');   //获取父节点 才能添加到页面中
+  var centerX=oParent.offsetWidth/2;   //中心点横坐标
+  var centerY=oParent.offsetHeight/2;   //中心点纵坐标
+
+  var circleNum=9;
+  var angleNum=360/circleNum;
+  var centerR=150;
+  var otherData=[];
+
+  for(var i=0;i<circleNum;i++){
+    var x=Math.cos(i*40*Math.PI/180)*centerR+centerX;
+    var y=Math.sin(i*40*Math.PI/180)*centerR+centerY;
+    otherData.push({x:x, y:y, text:i });
+  }
+
+//数据与操作分离
+  var data={
+    centerNode: {text:'心情如何'},
+    otherNode: otherData,
+  };
+
+  function createTag(tag, objAttr){       //封装一个创建标签的函数 这里取名为createTag
+      var oTag=document.createElementNS(svgNS, tag);
+      for(var attr in objAttr){
+         oTag.setAttribute(attr, objAttr[attr]);    //设置属性
+      }
+      return oTag;
+  }
+  
+//中间圆
+  function addTag(){
+     var oSvg=createTag('svg', {'xmlns':svgNS, 'width':'100%', 'height':'100%' });
+     
+     for(var i=0;i<data.otherNode.length;i++){
+        addOtherTag(data.otherNode[i], oSvg);
+     }
+
+     var oG=createTag('g', {'style':'cursor:pointer'});
+     var oCircle=createTag('circle', {'cx':centerX, 'cy':centerY, 'r':'40'  ,'fill':'white', 'stroke':'red', 'stroke-width':'1'});
+     var oText=createTag('text', {'x':centerX, 'y':centerY+8, 'font-size':'20', 'text-anchor':'middle' });
+     oText.innerHTML=data.centerNode.text;
+
+     oG.appendChild(oCircle);  //添加到oG
+     oG.appendChild(oText);  //添加到oG
+     oSvg.appendChild(oG);  //添加到oSvg
+     oParent.appendChild(oSvg);  //添加到oParent
+  }
+  //调用一下
+  addTag();
+
+//其他圆和线
+  function addOtherTag(otherAttr, oSvg){
+   //创建线
+    var oG=createTag('g', {'style':'cursor:pointer', 'class':'lineStyle'});
+    var oLine1=createTag('line', {'x1':otherAttr.x, 'y1':otherAttr.y, 'x2':centerX, 'y2':centerY, 'stroke':'#ccc'});
+    var oLine2=createTag('line', {'x1':otherAttr.x, 'y1':otherAttr.y, 'x2':centerX, 'y2':centerY, 'stroke':'transparent', 'stroke-width':'10'});
+    var oRect=createTag('rect', {'x':(centerX+otherAttr.x)/2-10, 'y':(centerY+otherAttr.y)/2-10, 'fill':'#999', 'width':'20', 'height':'20', 'rx':'5'});
+    var oText=createTag('text', {'x':(centerX+otherAttr.x)/2, 'y':(centerY+otherAttr.y)/2+8, 'fill':'white', 'font-size':'20', 'text-anchor':'middle' });
+    oText.innerHTML='?';  //添加文字
+
+    oG.appendChild(oLine1);  //添加到oG
+    oG.appendChild(oLine2);  //添加到oG
+    oG.appendChild(oRect);  //添加到oG
+    oG.appendChild(oText);  //添加到oG
+    oSvg.appendChild(oG);  //oG添加到oSvg
+  
+   //创建圆 
+    var oG=createTag('g', {'style':'cursor:pointer', 'class':'circleStyle'});
+    var oCircle=createTag('circle', {'cx':otherAttr.x, 'cy':otherAttr.y, 'r':'30'  ,'fill':'white', 'stroke':'red', 'stroke-width':'1'});
+    var oText=createTag('text', {'x':otherAttr.x, 'y':otherAttr.y+8, 'font-size':'20', 'text-anchor':'middle' });
+    oText.innerHTML=otherAttr.text; //文字是传过来的otherAttr的text
+
+    oG.appendChild(oCircle);  //添加到oG
+    oG.appendChild(oText);  //添加到oG
+    oSvg.appendChild(oG);  //添加到oSvg
+  }
+
+
+  bindTag();
+
+  function bindTag(){
+    var aLine=document.getElementsByClassName('lineStyle');
+    var aCircle=document.getElementsByClassName('circleStyle');
+    for(var i=0;i<aCircle.length;i++){
+      aCircle[i].onmouseenter=function(){
+        startMove(this.getElementsByTagName('circle')[0], 30 ,40); //this是g标签 要找到圆 起始值为半径30 目标变成40
+
+        var prevLine=this.previousElementSibling;         //获取上一个标签 此时为线的g标签
+        prevLine.getElementsByTagName('line')[0].setAttribute('stroke','blue');  //修改线为蓝色
+        prevLine.getElementsByTagName('rect')[0].setAttribute('fill','red');  //修改方块为红色
+
+      };
+      aCircle[i].onmouseleave=function(){
+        startMove(this.getElementsByTagName('circle')[0], 40 ,30); //this是g标签 要找到圆 起始值为半径40 目标变成30
+
+        var prevLine=this.previousElementSibling;         //获取上一个标签 此时为线的g标签
+        prevLine.getElementsByTagName('line')[0].setAttribute('stroke','#ccc');  //修改线为蓝色
+        prevLine.getElementsByTagName('rect')[0].setAttribute('fill','#999');  //修改方块为红色
+
+      };
+    }
+    for(var i=0;i<aLine.length;i++){
+      aLine[i].onmouseenter=function(){
+        this.getElementsByTagName('line')[0].setAttribute('stroke','blue');  //修改线为蓝色
+        this.getElementsByTagName('rect')[0].setAttribute('fill','red');  //修改方块为红色
+
+        var prevCircle=this.nextElementSibling;         //获取下一个标签 此时为圆的g标签
+        startMove(prevCircle.getElementsByTagName('circle')[0], 30 ,40); //this是g标签 要找到圆 起始值为半径40 目标变成30
+
+      };
+      aLine[i].onmouseleave=function(){
+        this.getElementsByTagName('line')[0].setAttribute('stroke','#ccc');  //修改线为蓝色
+        this.getElementsByTagName('rect')[0].setAttribute('fill','#999');  //修改方块为红色
+
+        var prevCircle=this.nextElementSibling;         //获取下一个标签 此时为圆的g标签
+        startMove(prevCircle.getElementsByTagName('circle')[0], 40 ,30); //this是g标签 要找到圆 起始值为半径40 目标变成30
+
+      };
+    }
+
+  }
+
+  //鼠标移入移出时的弹性变化
+  function startMove(obj, r1, r2){
+    var nowR=r1;
+    var overR=r2;
+    obj.speed=0;
+    clearInterval(obj.timer);
+    obj.timer=setInterval(function(){
+      obj.speed+=(overR-nowR)/6;
+      obj.speed*=0.9; //摩擦系数
+      if(Math.abs(overR-nowR)<=1 && Math.abs(obj.speed)<=1){
+        clearInterval(obj.timer);
+        obj.setAttribute('r', overR);
+      }
+      else{
+        nowR +=obj.speed;
+        obj.setAttribute('r', nowR);
+      }
+    },30);
+  }
+
+}  
+</script>
+</head>
+<body>
+<!--直接写svg的方法-->
+<div id="div1">
+
+</div>
+</body>
+</html>
