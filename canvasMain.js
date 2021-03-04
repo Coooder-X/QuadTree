@@ -1,8 +1,8 @@
 import QuadTree from "./QuadTree.js";
 import ManyBody from "./manyBody.js";
 import {judge, choose, caldis, getNodePair} from "./stop.js" ;
-import {paintCenter, getNodePos, getTree, nwk2json, randomNum, initTreeShape} from "./util.js";
-import {paintAllLinks, dfsPaint} from "./DrawUtil.js";
+import {getNodePos, getTree, nwk2json, randomNum, initTreeShape} from "./util.js";
+import {paintAllLinks, paintCenter, dfsPaint} from "./CDrawUtil.js";
 
 // var nodes = [{x:100, y:100}, {x:200, y:130}, {x:800, y:400}, {x:900, y:500}, {x:900, y:50}];
 // var nodes = [getNodePos(), getNodePos(), getNodePos(), getNodePos(), getNodePos()];
