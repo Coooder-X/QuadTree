@@ -129,12 +129,15 @@ export function initTreeShape(tree, width=1000, height=600) {
 		nodes.push(now.pos);
         que.shift();
         if(now.node.children != undefined) { //  是非叶子节点
-			let childrenList = [], leafList = [];
+			let childrenList = [];
 			now.node.children.forEach(child => {
 				if(child != undefined)
 					childrenList.push(child);
 			});
 			let nowAlpha = 0.0, subAlpha = 2 * Math.PI / (childrenList.length + 1);// + 0.05 / (2 * Math.PI);
+			if(now.node == tree) {
+				// subAlpha = 2 * Math.PI / (childrenList.length + 0);
+			}
 			childrenList.forEach(child => {
 				nowAlpha += subAlpha;
 				let tmpAlpha = Math.PI - now.alpha + nowAlpha;
