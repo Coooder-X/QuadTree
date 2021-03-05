@@ -1,6 +1,6 @@
 import ManyBody from "./manyBody.js";
 import {judge, choose, caldis, getNodePair} from "./stop.js" ;
-import {getTree, nwk2json, initTreeShape} from "./util.js";
+import {getTree, nwk2json, initTreeShape, processNoneName} from "./util.js";
 import {paintAllLinks, paintAllNodes, paintAllTexts, createShape} from "./SDrawUtil.js";
 
 var svgNS = 'http://www.w3.org/2000/svg';   //命名空间
@@ -20,10 +20,12 @@ var pad_Link = {oG: oG_Line, oSvg: oSvg};
 var pad_Text = {oG: oG_Text, oSvg: oSvg};
 
 let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
+// let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
 // let info = nwk2json('((C:0.3,D:0.4)E:0.1)F');
 let tree = getTree(info);
 console.log(tree);
 var nodes = initTreeShape(info, 1000, 600), edges = tree.edges, datas = tree.datas;
+let noneNameNodeIdx = processNoneName(datas);
 
 var manyBody = new ManyBody(null, 1000, 600);
 manyBody.nodes = nodes, manyBody.datas = datas, manyBody.edges = edges;
@@ -38,7 +40,7 @@ setInterval(function(){
     paintAmimation();
     paintAllLinks(manyBody.nodes, manyBody.edges, pad_Link);
     paintAllNodes(manyBody.nodes, pad_Node);
-    paintAllTexts(manyBody.nodes, manyBody.datas, pad_Text);
+    paintAllTexts(manyBody.nodes, manyBody.datas, noneNameNodeIdx, pad_Text);
 }, 1);
 
 function iter() {

@@ -12,9 +12,14 @@ export function paintAllNodes(nodes, pad) {
     });
 }
 //  绘制所有节点的文字
-export function paintAllTexts(nodes, datas, pad) {
+export function paintAllTexts(nodes, datas, filterSet, pad) {
     nodes.forEach((node, idx) => {
-        svgText(node.x + 8, node.y - 8, pad, 16, "Georgia", "black", datas[idx].name, idx);
+        if(!filterSet.has(idx)) {
+            svgText(node.x + 8, node.y - 8, pad, 16, "Georgia", "black", datas[idx].name, idx);
+        }
+        else {
+            svgText(node.x + 8, node.y - 8, pad, 16, "Georgia", "black", "", idx);
+        }
     });
 }
 

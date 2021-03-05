@@ -149,3 +149,28 @@ export function initTreeShape(tree, width=1000, height=600) {
     }
 	return nodes;
 }
+
+//	返回长度为len的随机字符串
+function randomString(len) {
+　　len = len || 32;
+　　var chars = 'ABCDEFGHJKMNOPQRSTWXYZabcdefhijkmn0prstwxyz012345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+　　var maxPos = chars.length;
+　　var pwd = '';
+　　for (let i = 0; i < len; i++) {
+　　　　pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+　　}
+　　return pwd;
+}
+
+//	对name为空串的节点进行处理，为其设置随机字符串作为name，并返回name为空的node的idx数组
+export function processNoneName(datas) {
+	let noneNameNodeIdx = new Set();
+	datas.forEach((data, idx) => {
+		if(data.name == '') {
+			noneNameNodeIdx.add(idx);
+			data.name = randomString(30);
+		}
+	});
+	return noneNameNodeIdx;
+}
+
