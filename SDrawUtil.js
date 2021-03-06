@@ -23,6 +23,10 @@ export function paintAllTexts(nodes, datas, filterSet, pad) {
     });
 }
 
+// export function paintSides(treeWidth, treeHeight, screenWidth, screenHeight, pad) {
+//     svgLine({x:0, y: 0}, {x: 0, y: screenWidth}, pad, "black", 3, i);
+// }
+
 //  绘制节点、四叉树分割线、重心
 // export function dfsPaint(Nodepad, linePad, textPad, centerPad, root) {
 //     if(root.isLeaf()/* && root != this.root*/) {
@@ -46,7 +50,7 @@ export function paintAllTexts(nodes, datas, filterSet, pad) {
 //     }
 // }
 
-//  封装canvas绘制直线
+//  封装svg绘制直线
 function svgLine(src, tar, pad, color, width, idx) {
     let line = pad.oG.getElementsByTagName('line')[idx];
     if(line != undefined) {
@@ -73,7 +77,7 @@ function svgLine(src, tar, pad, color, width, idx) {
 }
 
 /*
-  封装canvas绘制节点
+  封装svg绘制节点
   x,y 圆心坐标; pad为父标签集合; idx为该节点（节点或重心）索引（它们不在一个g标签内）
 */
 function svgPoint(x, y, pad, color, radius, idx) {    //  pad {oG: , oSvg: }
@@ -98,7 +102,7 @@ function svgPoint(x, y, pad, color, radius, idx) {    //  pad {oG: , oSvg: }
     }
 }
 
-//  封装canvas绘制文字
+//  封装svg绘制文字
 function svgText(x, y, pad, fontSize, font, color, text, idx) {
     let oText = pad.oG.getElementsByTagName('text')[idx];
     if(oText != undefined) {
@@ -177,4 +181,16 @@ function startMoveLine(obj, r1, r2) {
             obj.setAttribute('stroke-width', nowR);
         }
     }, 30);
+}
+
+export function positionShift(screenWidth, screenHeight, treeWidth, treeHeight, nodes) {
+    let centerX = screenWidth / 2, centerY = screenHeight / 2;
+    let centerX2 = treeWidth / 2, centerY2 = treeHeight / 2;
+    let dx = centerX2 - centerX, dy = centerY2 - centerY;
+    let shiftedNodes = [];
+    for(let i = 0; i < nodes.length; ++i) {
+        shiftedNodes.push({x: nodes[i].x - dx, y: nodes[i].y - dy});
+    }
+    console.log(shiftedNodes);
+    return shiftedNodes;
 }

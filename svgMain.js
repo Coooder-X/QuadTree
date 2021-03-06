@@ -1,7 +1,7 @@
 import ManyBody from "./manyBody.js";
 import {judge, choose, caldis, getNodePair} from "./stop.js" ;
 import {getTree, nwk2json, initTreeShape, processNoneName} from "./util.js";
-import {paintAllLinks, paintAllNodes, paintAllTexts, createShape} from "./SDrawUtil.js";
+import {paintAllLinks, paintAllNodes, paintAllTexts, createShape, positionShift} from "./SDrawUtil.js";
 
 var svgNS = 'http://www.w3.org/2000/svg';   //命名空间
 var oParent = document.getElementById("svg");   //获取父节点 才能添加到页面中
@@ -24,10 +24,13 @@ let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
 // let info = nwk2json('((C:0.3,D:0.4)E:0.1)F');
 let tree = getTree(info);
 console.log(tree);
-var nodes = initTreeShape(info, 1000, 600), edges = tree.edges, datas = tree.datas;
+var treeWidth = 4000, treeHeight = 2400;
+let screenWidth = oParent.offsetWidth, screenHeight = oParent.offsetHeight;
+var nodes = initTreeShape(info, treeWidth, treeHeight), edges = tree.edges, datas = tree.datas;
+//  获得name为空的节点索引，并为这些节点分配随机name
 let noneNameNodeIdx = processNoneName(datas);
 
-var manyBody = new ManyBody(null, 1000, 600);
+var manyBody = new ManyBody(null, treeWidth, treeHeight);
 manyBody.nodes = nodes, manyBody.datas = datas, manyBody.edges = edges;
 manyBody.buildTree();
 
@@ -38,9 +41,11 @@ var record = 0;
 
 setInterval(function(){
     paintAmimation();
-    paintAllLinks(manyBody.nodes, manyBody.edges, pad_Link);
-    paintAllNodes(manyBody.nodes, pad_Node);
-    paintAllTexts(manyBody.nodes, manyBody.datas, noneNameNodeIdx, pad_Text);
+    //  由于quadTree的合法范围可能比视窗大很多，因此将nodes平移到视窗中心，存储在shiftedNodes中
+    let shiftedNodes = positionShift(screenWidth, screenHeight, treeWidth, treeHeight, manyBody.nodes);
+    paintAllLinks(shiftedNodes, manyBody.edges, pad_Link);
+    paintAllNodes(shiftedNodes, pad_Node);
+    paintAllTexts(shiftedNodes, manyBody.datas, noneNameNodeIdx, pad_Text);
 }, 1);
 
 function iter() {
