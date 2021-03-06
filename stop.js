@@ -52,7 +52,7 @@ function bfs(startIdx, G) {
     return end;
 }
 
-function createGraph(edges) {   //  根据edges建立图邻接表
+export function createGraph(edges) {   //  根据edges建立图邻接表
     let G = new Array();
     for(let i = 0; i < edges.length + 1; ++i)
         G.push(new Array());

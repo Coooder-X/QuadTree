@@ -113,11 +113,11 @@ export function getTree(tree) {
 }
 
 function getLen(num) {
-    return num * 380;	//	280
+    return num * 380;	//	680
 }
 
 function getE(len) {
-    return len * 1300;
+    return len * 1300;	//	100000
 }
 
 export function initTreeShape(tree, width=1000, height=600) {
@@ -174,3 +174,13 @@ export function processNoneName(datas) {
 	return noneNameNodeIdx;
 }
 
+
+export function processLeaf(G) {
+	let notLeaf = new Set();
+	G.forEach((edge, idx) => {
+		if(edge.length != 1) {
+			notLeaf.add(idx);
+		}
+	});
+	return notLeaf;
+}

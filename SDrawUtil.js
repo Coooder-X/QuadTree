@@ -12,20 +12,40 @@ export function paintAllNodes(nodes, pad) {
     });
 }
 //  绘制所有节点的文字
-export function paintAllTexts(nodes, datas, filterSet, pad) {
+export function paintAllTexts(nodes, datas, G, notLeaf, filterSet, pad) {
+    let fontSize = 20;
     nodes.forEach((node, idx) => {
-        if(!filterSet.has(idx)) {
-            svgText(node.x + 8, node.y - 8, pad, 16, "Georgia", "black", datas[idx].name, idx);
+        if(!filterSet.has(idx)) {   //  若name不为null
+            if(notLeaf.has(idx)) { //  若当前点不是叶节点，不打印
+                svgText(node.x + 8, node.y - 8, pad, 0, fontSize, "Georgia", "black", "", idx);
+            }
+            else { //  打印叶节点
+                let father = nodes[G[idx][0].pos];
+                let dx = node.x - father.x, dy = node.y - father.y;
+                //  通过找到上一标签（circle标签），获得节点的半径 r
+                let r = Number(document.getElementById("svg").getElementsByTagName('circle')[idx].getAttribute('r'));
+                let dis = Math.sqrt(dx * dx + dy * dy), gap = 15 + r;    //  gap是节点到字的间距
+                let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
+                let alpha = 360 * Math.asin(Math.abs(dy) / dis) / (2 * Math.PI);// alpha是边和x轴锐角绝对值
+                if(dx > 0 && dy < 0) {  //  第一象限
+                    alpha = 360 - alpha;
+                } else if(dx < 0 && dy < 0) {  //  第二象限
+                    alpha += 180;
+                } else if(dx < 0 && dy > 0) {  //  第三象限
+                    alpha = 180 - alpha;
+                } else {  //  第四象限
+                    alpha = alpha;
+                }   //  计算出文字应旋转的角度alpha（x轴正向是0°，顺时针是正方向）
+                dx = (gap * cos) * (dx < 0? -1 : 1), dy = (gap * sin) * (dy < 0? -1 : 1);
+                // console.log(alpha);
+                svgText(node.x + dx, node.y + dy, pad, alpha, fontSize, "Georgia", "black", datas[idx].name, idx);
+            }
         }
-        else {
-            svgText(node.x + 8, node.y - 8, pad, 16, "Georgia", "black", "", idx);
+        else {  //  name为null
+            svgText(node.x + 8, node.y - 8, pad, 0, fontSize, "Georgia", "black", "", idx);
         }
     });
 }
-
-// export function paintSides(treeWidth, treeHeight, screenWidth, screenHeight, pad) {
-//     svgLine({x:0, y: 0}, {x: 0, y: screenWidth}, pad, "black", 3, i);
-// }
 
 //  绘制节点、四叉树分割线、重心
 // export function dfsPaint(Nodepad, linePad, textPad, centerPad, root) {
@@ -103,18 +123,20 @@ function svgPoint(x, y, pad, color, radius, idx) {    //  pad {oG: , oSvg: }
 }
 
 //  封装svg绘制文字
-function svgText(x, y, pad, fontSize, font, color, text, idx) {
+function svgText(x, y, pad, alpha = 0, fontSize, font, color, text, idx) {
     let oText = pad.oG.getElementsByTagName('text')[idx];
     if(oText != undefined) {
         oText.setAttribute('x', x);
         oText.setAttribute('y', y);
     }
     else {
-        oText = createShape('text', {'x':x, 'y':y, 'fill':color, 'font-size':fontSize, 'text-anchor':'middle' });
+        oText = createShape('text', {'x':x, 'y':y, 'fill':color, 'font-size':fontSize, 'text-anchor':'middle', 'font-family':font });
         oText.innerHTML = text;  //添加文字
         pad.oG.appendChild(oText);  //添加到oG
         pad.oSvg.appendChild(pad.oG);  //添加到oSvg
     }
+    oText.setAttribute("text-anchor", "start"); //  text-anchor="start"时，(x,y)为<text>的起始坐标
+    oText.setAttribute("transform", 'rotate(' + alpha + ' ' + x + ' ' + y + ')');   // 设置文字旋转角度和旋转中心
 }
 
 //  绘制重心
@@ -191,6 +213,5 @@ export function positionShift(screenWidth, screenHeight, treeWidth, treeHeight, 
     for(let i = 0; i < nodes.length; ++i) {
         shiftedNodes.push({x: nodes[i].x - dx, y: nodes[i].y - dy});
     }
-    console.log(shiftedNodes);
     return shiftedNodes;
 }
