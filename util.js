@@ -86,8 +86,9 @@ export function json2nwk(json) {
 export function getTree(tree) {
     let nodes = [], edges = [], datas = [], idx = 0;
     let que = new Array(), now = {node: tree, idx: 0};
+	let avgE = 0;
 	//  根节点的E设为100? (设为0会导致计算force时出现力为0，nodes变为NaN，若设置过小会导致该节点剧烈摆动而不收敛)
-    datas.push({name: now.node.name, E: 100});  
+    datas.push({name: now.node.name, E: 0});  //	取根节点的 E 为所有 E 的平均值
     que.push(now);
     while(que.length) {
         now = que[0];
@@ -106,9 +107,11 @@ export function getTree(tree) {
                     edges.push({source: now.idx, target: idx, length: getLen(child.branch_length)});
                     datas.push({name: child.name, E: getE(child.branch_length)});
                 }
+				avgE += datas[datas.length-1].E;
             }
         }
     }
+	datas[0].E = avgE / (datas.length - 1);
     return {edges: edges, datas: datas};
 }
 
