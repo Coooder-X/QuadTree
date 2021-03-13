@@ -2,7 +2,7 @@ import QuadTree, {chargeForce} from "./QuadTree.js"
 export default class ManyBody {
     constructor(ctx, w, h) {
         this.width = w, this.height = h;
-        this.k = 0.08;  //  弹性劲度系数 (需要改为动态计算，适用于各种情况)
+        this.k = 0.8;  //  弹性劲度系数 (需要改为动态计算，适用于各种情况)
         // this.m = ;  //  每个节点的质量的倒数，仅在计算边的弹性力时起作用（避免）
         this.ctx = ctx;
         this.nodes = [];
@@ -58,12 +58,11 @@ export default class ManyBody {
             let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
             let F = this.k * Math.abs(dis - this.edges[i].length);
             let vx = F * cos, vy = F * sin;
-            let maxV = 10;   //  最大速度限制
-            vx = Math.min(Math.abs(vx), maxV), vy = Math.min(Math.abs(vy), maxV);
-            src.x += (dx > 0? -vx : vx);
-            src.y += (dy > 0? -vy : vy);
-            tar.x += (dx > 0? vx : -vx);
-            tar.y += (dy > 0? vy : -vy);
+            //  dv = -Ft/E
+            src.x += (dx > 0? -vx : vx) / this.datas[this.edges[i].source].E;
+            src.y += (dy > 0? -vy : vy) / this.datas[this.edges[i].source].E;
+            tar.x += (dx > 0? vx : -vx) / this.datas[this.edges[i].target].E;
+            tar.y += (dy > 0? vy : -vy) / this.datas[this.edges[i].target].E;
             // this.paintLink(src, tar);
         }
     }
