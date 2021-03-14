@@ -2,7 +2,7 @@ import QuadTree, {chargeForce} from "./QuadTree.js"
 export default class ManyBody {
     constructor(ctx, w, h) {
         this.width = w, this.height = h;
-        this.k = 0.8;  //  弹性劲度系数 (需要改为动态计算，适用于各种情况)
+        this.k = 0.9;  //  弹性劲度系数 (需要改为动态计算，适用于各种情况)
         // this.m = ;  //  每个节点的质量的倒数，仅在计算边的弹性力时起作用（避免）
         this.ctx = ctx;
         this.nodes = [];

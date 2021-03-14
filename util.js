@@ -116,11 +116,11 @@ export function getTree(tree) {
 }
 
 function getLen(num) {
-    return num * 380;	//	680
+    return num * 80 * 0.3;	//	680
 }
 
 function getE(len) {
-    return len * 1300;	//	100000
+    return len * 1300 * 0.3;	//	100000
 }
 
 export function initTreeShape(tree, width=1000, height=600) {
@@ -154,7 +154,7 @@ export function initTreeShape(tree, width=1000, height=600) {
 }
 
 //	返回长度为len的随机字符串
-function randomString(len) {
+export function randomString(len) {
 　　len = len || 32;
 　　var chars = 'ABCDEFGHJKMNOPQRSTWXYZabcdefhijkmn0prstwxyz012345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
 　　var maxPos = chars.length;

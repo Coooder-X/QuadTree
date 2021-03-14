@@ -2,6 +2,7 @@ import ManyBody from "./manyBody.js";
 import {judge, choose, caldis, getNodePair, createGraph} from "./stop.js" ;
 import {getTree, nwk2json, initTreeShape, processNoneName, processLeaf} from "./util.js";
 import {paintAllLinks, paintAllNodes, paintAllTexts, createShape, positionShift} from "./SDrawUtil.js";
+import randomNewick from "./AutoNwk.js";
 
 var svgNS = 'http://www.w3.org/2000/svg';   //命名空间
 var oParent = document.getElementById("svg");   //获取父节点 才能添加到页面中
@@ -19,14 +20,16 @@ var pad_Node = {oG: oG_Node, oSvg: oSvg};
 var pad_Link = {oG: oG_Line, oSvg: oSvg};
 var pad_Text = {oG: oG_Text, oSvg: oSvg};
 
+let s = randomNewick();
+
 // let s = '(((((Pan_paniscus|NC_001644.1:0.01960746,Pan_troglodytes|NC_001643.1:0.02081902)1.0000:0.02915852,Homo_sapiens|NC_012920.1:0.04538179)1.0000:0.01754464,Gorilla_gorilla|NC_001645.1:0.06012159)1.0000:0.03537649,(Pongo_abelii|NC_002083.1:0.03395723,Pongo_pygmaeus|NC_001646.1:0.03458433)1.0000:0.06280597)0.0000:0.00591154,Hylobates_lar|NC_002082.1:0.10881021)';
-// let info = nwk2json(s);
-let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
+let info = nwk2json(s);
+// let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
 // let info = nwk2json('(A:0.1,B:0.2,(C:0.3,D:0.4)E:0.5)F');
 // let info = nwk2json('((C:0.3,D:0.4)E:0.1)F');
 let tree = getTree(info);
 console.log(tree);
-var treeWidth = 4000, treeHeight = 2400;
+var treeWidth = 4000 * 15, treeHeight = 2400 * 15;
 let screenWidth = oParent.offsetWidth, screenHeight = oParent.offsetHeight;
 var nodes = initTreeShape(info, treeWidth, treeHeight), edges = tree.edges, datas = tree.datas;
 
