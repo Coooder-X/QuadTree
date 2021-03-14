@@ -59,10 +59,10 @@ export default class ManyBody {
             let F = this.k * Math.abs(dis - this.edges[i].length);
             let vx = F * cos, vy = F * sin;
             //  dv = -Ft/E
-            src.x += (dx > 0? -vx : vx) / this.datas[this.edges[i].source].E;
-            src.y += (dy > 0? -vy : vy) / this.datas[this.edges[i].source].E;
-            tar.x += (dx > 0? vx : -vx) / this.datas[this.edges[i].target].E;
-            tar.y += (dy > 0? vy : -vy) / this.datas[this.edges[i].target].E;
+            src.x += (dx > 0? -vx : vx) / this.datas[0].E;  //  为防止 E 过小导致 dv 变化过大，每个点都取 E 的平均值
+            src.y += (dy > 0? -vy : vy) / this.datas[0].E;
+            tar.x += (dx > 0? vx : -vx) / this.datas[0].E;
+            tar.y += (dy > 0? vy : -vy) / this.datas[0].E;
             // this.paintLink(src, tar);
         }
     }

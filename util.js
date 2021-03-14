@@ -131,32 +131,49 @@ export function initTreeShape(tree, width=1000, height=600) {
         now = que[0];
 		nodes.push(now.pos);
         que.shift();
-        if(now.node.children != undefined) { //  是非叶子节点
+        if(now.node.children != undefined && now.node.children.length > 0) { //  是非叶子节点
 			let childrenList = [];
 			now.node.children.forEach(child => {
 				if(child != undefined)
 					childrenList.push(child);
 			});
-			let nowAlpha = 0.0, subAlpha = 2 * Math.PI / (childrenList.length + 1);// + 0.05 / (2 * Math.PI);
+			let nowAlpha = fatherEdgeAngle(now.alpha), subAlpha = 2 * Math.PI / (childrenList.length + 1);
 			if(now.node == tree) {
-				// subAlpha = 2 * Math.PI / (childrenList.length + 0);
+				subAlpha = 2 * Math.PI / (childrenList.length + 0);
 			}
 			childrenList.forEach(child => {
 				nowAlpha += subAlpha;
-				let tmpAlpha = Math.PI - now.alpha + nowAlpha;
-				let dx = Math.cos(tmpAlpha) * getLen(child.branch_length), dy = Math.sin(tmpAlpha) * getLen(child.branch_length);
-				let tmpPos = {x: now.pos.x + dx, y: now.pos.y + dy};
-				que.push({node: child, pos: tmpPos, alpha: tmpAlpha});
+				let dx = Math.cos(nowAlpha) * getLen(child.branch_length), dy = Math.sin(nowAlpha) * getLen(child.branch_length);
+				/*	下面对 dx dy 扩大 10 倍是因为，实际稳定的系统，边经过拉伸才显示到视觉正常范围，初始化未拉伸前，边过短，导致电荷力
+					影响过大，以至节点爆炸式飞散，出现一系列问题（或许之后可以改从电荷力作用方式解决这个问题）	*/
+				let tmpPos = {x: now.pos.x + dx * 10, y: now.pos.y + dy * 10};
+				que.push({node: child, pos: tmpPos, alpha: nowAlpha});
 			});
         }
     }
 	return nodes;
 }
 
+//	初始化子节点的边的角度时，将角度基准转换为父边的角度, alpha 是父边角度，beta 是返回的子边基准角
+function fatherEdgeAngle(alpha) {
+	let PI = Math.PI;
+	//	先将 alpha 转换成 [0, 2pi] 的区间
+	let k = Math.floor(alpha / (2 * PI));
+	alpha -= k * (2 * PI);
+	//	分情况计算 beta
+	let beta = 0;
+	if(alpha < PI) {
+		beta = PI + alpha;	//	2pi - (pi - alpha)
+	} else {
+		beta = alpha - PI;	//	pi - (2pi - alpha)
+	}
+	return beta;
+}
+
 //	返回长度为len的随机字符串
 export function randomString(len) {
 　　len = len || 32;
-　　var chars = 'ABCDEFGHJKMNOPQRSTWXYZabcdefhijkmn0prstwxyz012345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+　　var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
 　　var maxPos = chars.length;
 　　var pwd = '';
 　　for (let i = 0; i < len; i++) {
