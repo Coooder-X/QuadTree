@@ -32,15 +32,17 @@ export default function randomNewick() {
         let childNum = Math.min(randomNum(Min, 7), n);  //  当前节点孩子数
         n -= childNum;
         let children = [];
-        while(childNum > 0) {
-            childNum--;
-            let child = {};
-            child.name = randomName();
-            child.branch_length = Math.random();
-            children.push(child);
-            que.push(child);
+        if(childNum > 0) {
+            while(childNum > 0) {
+                childNum--;
+                let child = {};
+                child.name = randomName();
+                child.branch_length = Math.random();
+                children.push(child);
+                que.push(child);
+            }
+            now.children = children;
         }
-        now.children = children;
     }
     console.log(root);
     console.log(json2nwk(root));
