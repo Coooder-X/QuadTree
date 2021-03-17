@@ -2,7 +2,7 @@ import QuadTree, {chargeForce} from "./QuadTree.js"
 export default class ManyBody {
     constructor(ctx, w, h) {
         this.width = w, this.height = h;
-        this.k = 0.9;  //  弹性劲度系数 (需要改为动态计算，适用于各种情况)
+        this.k = 5;  //  弹性劲度系数 (需要改为动态计算，适用于各种情况)
         // this.m = ;  //  每个节点的质量的倒数，仅在计算边的弹性力时起作用（避免）
         this.ctx = ctx;
         this.nodes = [];
@@ -56,13 +56,16 @@ export default class ManyBody {
             let dx = src.x - tar.x, dy = src.y - tar.y;
             let dis = Math.sqrt(dx * dx + dy * dy);
             let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
-            let F = this.k * Math.abs(dis - this.edges[i].length);
-            let vx = F * cos, vy = F * sin;
+            let F = this.k * Math.pow(Math.abs(dis - this.edges[i].length), 1);
+            let avgE = this.datas[0].E * 2;
+            let vx = F * cos / avgE, vy = F * sin / avgE;
+            let Maxv = 10;
+            vx = Math.min(Maxv, vx), vy = Math.min(Maxv, vy);
             //  dv = -Ft/E
-            src.x += (dx > 0? -vx : vx) / this.datas[0].E;  //  为防止 E 过小导致 dv 变化过大，每个点都取 E 的平均值
-            src.y += (dy > 0? -vy : vy) / this.datas[0].E;
-            tar.x += (dx > 0? vx : -vx) / this.datas[0].E;
-            tar.y += (dy > 0? vy : -vy) / this.datas[0].E;
+            src.x += (dx > 0? -vx : vx);  //  为防止 E 过小导致 dv 变化过大，每个点都取 E 的平均值
+            src.y += (dy > 0? -vy : vy);
+            tar.x += (dx > 0? vx : -vx);
+            tar.y += (dy > 0? vy : -vy);
             // this.paintLink(src, tar);
         }
     }
@@ -71,7 +74,9 @@ export default class ManyBody {
         迭代到一定程度时，将系统重心与屏幕中心重合显示
     */
     centering() {
-        let dx = this.quadTree.root.centerX - this.width / 2, dy = this.quadTree.root.centerY - this.height / 2;
+        // let dx = this.quadTree.root.centerX - this.width / 2, dy = this.quadTree.root.centerY - this.height / 2;
+        //  将树以根节点为基准固定在屏幕中心，防止重心近似计算导致
+        let dx = this.nodes[0].x - this.width / 2, dy = this.nodes[0].y - this.height / 2;
         for(let i = 0; i < this.nodes.length; ++i) {
             if(this.nodes[i].x - dx < 0 || this.nodes[i].y - dy < 0
                 || this.nodes[i].x - dx > this.width || this.nodes[i].y - dy > this.height)

@@ -116,11 +116,11 @@ export function getTree(tree) {
 }
 
 function getLen(num) {
-    return num * 80 * 0.3;	//	680
+    return num * 80 * 0.3;	//	680		num * 460 * 0.3
 }
 
 function getE(len) {
-    return len * 1300 * 0.3;	//	100000
+    return len * 1300 * 0.3;	//	100000		len * 700 * 0.3
 }
 
 export function initTreeShape(tree, width=1000, height=600) {
