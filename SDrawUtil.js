@@ -1,3 +1,55 @@
+var scale = 1.0;
+var viewBoxX = 0, viewBoxY = 0;
+var startX = 0, startY = 0;
+var tmpx = 0, tmpy = 0; //  有关 svg 画布平移、缩放的全局参数
+
+export function svgAddMousewheel(oSvg) {    //  鼠标滚轮缩放 svg
+    oSvg.addEventListener("mousewheel", ZoomInOut, false);
+    function ZoomInOut(e) {
+        e = e || window.event;  
+        let gap = 0.08;
+        if (e.wheelDelta) {  //判断浏览器IE，谷歌滑轮事件               
+            if (e.wheelDelta > 0) { //当滑轮向上滚动时  
+                scale -= gap;
+            }  
+            if (e.wheelDelta < 0) { //当滑轮向下滚动时  
+                scale += gap;
+            }  
+        } else if (e.detail) {  //Firefox滑轮事件  
+            if (e.detail> 0) { //当滑轮向下滚动时  
+                scale += gap;
+            }  
+            if (e.detail< 0) { //当滑轮向上滚动时  
+                scale -= gap;
+            }  
+        } 
+        oSvg.setAttribute('transform', 'translate(' + viewBoxX  + ', ' + viewBoxY + ') scale(' + scale + ')');
+    }
+}
+
+var isMove = false;
+export function svgMove(oSvg) { //  鼠标拖动 svg 画布
+    oSvg.addEventListener('mousedown', function (e) {
+        oSvg.setAttribute('style', 'cursor: move');
+        isMove = true;
+        startX = e.pageX;
+        startY = e.pageY;
+    });
+    oSvg.addEventListener('mouseup', function (e) {
+        isMove = false;
+        oSvg.setAttribute('style', 'cursor: default');
+        viewBoxX += tmpx, viewBoxY += tmpy;
+    });
+    oSvg.addEventListener('mousemove', function (e) {
+        if (isMove) {
+            console.log(viewBoxX, viewBoxY);
+            tmpx = e.pageX - startX;
+            tmpy = e.pageY - startY;
+            oSvg.setAttribute('transform', 'translate(' + (viewBoxX + tmpx) + ', ' + (viewBoxY + tmpy) + ') scale(' + scale + ')');
+        }
+    });
+}
+
 //  绘制所有连接节点的边
 export function paintAllLinks(nodes, edges, pad) {
     for(let i = 0; i < edges.length; ++i) {
@@ -23,7 +75,9 @@ export function paintAllTexts(nodes, datas, G, notLeaf, filterSet, pad) {
                 let father = nodes[G[idx][0].pos];
                 let dx = node.x - father.x, dy = node.y - father.y;
                 //  通过找到上一标签（circle标签），获得节点的半径 r
-                let r = Number(document.getElementById("svg").getElementsByTagName('circle')[idx].getAttribute('r'));
+                let r = 0;
+                if(Number(document.getElementById("svg").getElementsByTagName('circle')[idx] != undefined))
+                    r = Number(document.getElementById("svg").getElementsByTagName('circle')[idx].getAttribute('r'));
                 let dis = Math.sqrt(dx * dx + dy * dy), gap = 15 + r;    //  gap是节点到字的间距
                 let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
                 let alpha = 360 * Math.asin(Math.abs(dy) / dis) / (2 * Math.PI);// alpha是边和x轴锐角绝对值
@@ -119,6 +173,9 @@ function svgPoint(x, y, pad, color, radius, idx) {    //  pad {oG: , oSvg: }
             circle.setAttribute('fill', color);
             circle.setAttribute('stroke', color);
         };
+        // circle.onmouseclick = function() {
+        //     // console.log("click");
+        // };
     }
 }
 
