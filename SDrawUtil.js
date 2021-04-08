@@ -1,51 +1,46 @@
-var scale = 1.0;
-var viewBoxX = 0, viewBoxY = 0;
-var startX = 0, startY = 0;
-var tmpx = 0, tmpy = 0; //  有关 svg 画布平移、缩放的全局参数
-
-export function svgAddMousewheel(oSvg) {    //  鼠标滚轮缩放 svg
-    oSvg.addEventListener("mousewheel", ZoomInOut, false);
+export function svgAddMousewheel(oParent, oSvg, svgControl) {    //  鼠标滚轮缩放 svg (实际上鼠标动作作用于 svg 的父亲标签 oParent)
+    oParent.addEventListener("mousewheel", ZoomInOut, false);
     function ZoomInOut(e) {
         e = e || window.event;  
         let gap = 0.08;
         if (e.wheelDelta) {  //判断浏览器IE，谷歌滑轮事件               
             if (e.wheelDelta > 0) { //当滑轮向上滚动时  
-                scale -= gap;
+                svgControl.scale -= gap;
             }  
             if (e.wheelDelta < 0) { //当滑轮向下滚动时  
-                scale += gap;
+                svgControl.scale += gap;
             }  
         } else if (e.detail) {  //Firefox滑轮事件  
             if (e.detail> 0) { //当滑轮向下滚动时  
-                scale += gap;
+                svgControl.scale += gap;
             }  
             if (e.detail< 0) { //当滑轮向上滚动时  
-                scale -= gap;
+                svgControl.scale -= gap;
             }  
         } 
-        oSvg.setAttribute('transform', 'translate(' + viewBoxX  + ', ' + viewBoxY + ') scale(' + scale + ')');
+        oSvg.setAttribute('transform', 'translate(' + svgControl.viewBoxX  + ', ' + svgControl.viewBoxY + ') scale(' + svgControl.scale + ')');
     }
 }
 
 var isMove = false;
-export function svgMove(oSvg) { //  鼠标拖动 svg 画布
-    oSvg.addEventListener('mousedown', function (e) {
-        oSvg.setAttribute('style', 'cursor: move');
+export function svgMove(oParent, oSvg, svgControl) { //  鼠标拖动 svg 画布 (实际上鼠标动作作用于 svg 的父亲标签 oParent)
+    oParent.addEventListener('mousedown', function (e) {
+        oParent.setAttribute('style', 'cursor: move');
         isMove = true;
-        startX = e.pageX;
-        startY = e.pageY;
+        svgControl.startX = e.pageX;
+        svgControl.startY = e.pageY;
     });
-    oSvg.addEventListener('mouseup', function (e) {
+    oParent.addEventListener('mouseup', function (e) {
         isMove = false;
-        oSvg.setAttribute('style', 'cursor: default');
-        viewBoxX += tmpx, viewBoxY += tmpy;
+        oParent.setAttribute('style', 'cursor: default');
+        svgControl.viewBoxX += svgControl.tmpx, svgControl.viewBoxY += svgControl.tmpy;
     });
-    oSvg.addEventListener('mousemove', function (e) {
+    oParent.addEventListener('mousemove', function (e) {
         if (isMove) {
-            console.log(viewBoxX, viewBoxY);
-            tmpx = e.pageX - startX;
-            tmpy = e.pageY - startY;
-            oSvg.setAttribute('transform', 'translate(' + (viewBoxX + tmpx) + ', ' + (viewBoxY + tmpy) + ') scale(' + scale + ')');
+            // console.log(svgControl.viewBoxX, svgControl.viewBoxY);
+            svgControl.tmpx = e.pageX - svgControl.startX;
+            svgControl.tmpy = e.pageY - svgControl.startY;
+            oSvg.setAttribute('transform', 'translate(' + (svgControl.viewBoxX + svgControl.tmpx) + ', ' + (svgControl.viewBoxY + svgControl.tmpy) + ') scale(' + svgControl.scale + ')');
         }
     });
 }
@@ -76,8 +71,8 @@ export function paintAllTexts(nodes, datas, G, notLeaf, filterSet, pad) {
                 let dx = node.x - father.x, dy = node.y - father.y;
                 //  通过找到上一标签（circle标签），获得节点的半径 r
                 let r = 0;
-                if(Number(document.getElementById("svg").getElementsByTagName('circle')[idx] != undefined))
-                    r = Number(document.getElementById("svg").getElementsByTagName('circle')[idx].getAttribute('r'));
+                if(Number(pad.oSvg.getElementsByTagName('circle')[idx] != undefined))
+                    r = Number(pad.oSvg.getElementsByTagName('circle')[idx].getAttribute('r'));
                 let dis = Math.sqrt(dx * dx + dy * dy), gap = 15 + r;    //  gap是节点到字的间距
                 let sin = Math.abs(dy / dis), cos = Math.abs(dx / dis);
                 let alpha = 360 * Math.asin(Math.abs(dy) / dis) / (2 * Math.PI);// alpha是边和x轴锐角绝对值
